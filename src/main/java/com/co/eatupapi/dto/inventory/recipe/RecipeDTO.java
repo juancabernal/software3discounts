@@ -1,6 +1,6 @@
 package com.co.eatupapi.dto.inventory.recipe;
 
-import com.co.eatupapi.domain.inventory.Product;
+import com.co.eatupapi.domain.inventory.product.Product;
 
 import java.util.List;
 
