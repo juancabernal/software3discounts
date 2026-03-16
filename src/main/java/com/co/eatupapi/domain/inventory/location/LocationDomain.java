@@ -1,6 +1,7 @@
 package com.co.eatupapi.domain.inventory.location;
 
 public class LocationDomain {
+    private String id;
     private String name;
     private String city;
     private String address;
@@ -9,7 +10,8 @@ public class LocationDomain {
     private String phoneNumber;
     private ScheduleLocation scheduleLocation;
 
-    public LocationDomain(final String name, String city, final String address, final boolean active, final String email, final String phoneNumber, final ScheduleLocation scheduleLocation) {
+    public LocationDomain(final String id, final String name, String city, final String address, final boolean active, final String email, final String phoneNumber, final ScheduleLocation scheduleLocation) {
+        setId(id);
         setName(name);
         setCity(city);
         setAddress(address);
@@ -75,4 +77,11 @@ public class LocationDomain {
         this.scheduleLocation = scheduleLocation;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

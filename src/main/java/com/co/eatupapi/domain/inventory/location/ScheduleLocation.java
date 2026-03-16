@@ -1,6 +1,6 @@
 package com.co.eatupapi.domain.inventory.location;
 
-class ScheduleLocation {
+public class ScheduleLocation {
     private String startTime;
     private String endTime;
     private String displayViewTime;

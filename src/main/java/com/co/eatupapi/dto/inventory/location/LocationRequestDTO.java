@@ -1,4 +1,4 @@
 package com.co.eatupapi.dto.inventory.location;
 
-public class LocationDTO {
+public class LocationRequestDTO {
 }
