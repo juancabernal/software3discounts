@@ -54,13 +54,13 @@ public class CashReceiptController {
             @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
     })
     @GetMapping
-    public Page<CashReceiptResponse> getCashReceipts(
+    public ResponseEntity<Page<CashReceiptResponse>> getCashReceipts(
             @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
             @Parameter(description = "Número de página (inicia en 0)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Cantidad de resultados por página") @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return cashReceiptService.getCashReceiptsBySite(siteId, pageable);
+        return ResponseEntity.ok(cashReceiptService.getCashReceiptsBySite(siteId, pageable));
     }
 
     @Operation(
@@ -72,11 +72,12 @@ public class CashReceiptController {
             @ApiResponse(responseCode = "400", description = "El recibo ya fue anulado previamente"),
             @ApiResponse(responseCode = "404", description = "Recibo no encontrado")
     })
+
     @PatchMapping("/{id}/cancel")
-    public CashReceiptResponse cancelCashReceipt(
+    public ResponseEntity<CashReceiptResponse> cancelCashReceipt(
             @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
             @Parameter(description = "ID del recibo a anular") @PathVariable UUID id) {
 
-        return cashReceiptService.cancelCashReceipt(siteId, id);
+        return ResponseEntity.ok(cashReceiptService.cancelCashReceipt(siteId, id));
     }
 }

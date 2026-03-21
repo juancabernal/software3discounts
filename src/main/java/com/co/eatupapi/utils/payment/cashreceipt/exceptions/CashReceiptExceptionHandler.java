@@ -33,10 +33,14 @@ public class CashReceiptExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
 
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .get(0)
-                .getDefaultMessage();
+        String message;
+        if (!ex.getBindingResult().getFieldErrors().isEmpty()) {
+            message = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        } else if (!ex.getBindingResult().getGlobalErrors().isEmpty()) {
+            message = ex.getBindingResult().getGlobalErrors().get(0).getDefaultMessage();
+        } else {
+            message = "Validation failed";
+        }
 
         ApiErrorResponse error = new ApiErrorResponse(
                 ErrorCode.VALIDATION_ERROR,
