@@ -13,12 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class InMemoryDiscountsRepository implements DiscountsRepository {
 
-    private static final UUID CATEGORY_ID_1 = UUID.fromString("10f11111-1111-1111-1111-111111111111");
-    private static final UUID CATEGORY_ID_2 = UUID.fromString("20f22222-2222-2222-2222-222222222222");
-    private static final UUID DISCOUNT_ID_1 = UUID.fromString("90000000-0000-0000-0000-000000000001");
-    private static final UUID DISCOUNT_ID_2 = UUID.fromString("90000000-0000-0000-0000-000000000002");
-
     private final Map<UUID, DiscountsDomain> storage = new ConcurrentHashMap<>();
+
+    private static final UUID DISCOUNT_ID_1 = UUID.fromString("1bfe56ac-2c12-452f-9a05-c190c7313684");
+    private static final UUID DISCOUNT_ID_2 = UUID.fromString("55e68258-fa94-4a0e-914e-eb935459bfe8");
+
+    private static final UUID CATEGORY_ID_1 = UUID.fromString("d2a1b2b5-588e-4d63-8b07-9609f3894624");
+    private static final UUID CATEGORY_ID_2 = UUID.fromString("fb28620b-9ec6-4a9d-8ce2-cbb4d9e7edeb");
 
     public InMemoryDiscountsRepository() {
         DiscountsDomain first = new DiscountsDomain(

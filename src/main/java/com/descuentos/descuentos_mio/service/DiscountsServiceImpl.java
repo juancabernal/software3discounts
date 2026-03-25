@@ -1,6 +1,5 @@
 package com.descuentos.descuentos_mio.service;
 
-import com.descuentos.descuentos_mio.client.CategoryServiceClient;
 import com.descuentos.descuentos_mio.domain.DiscountsDomain;
 import com.descuentos.descuentos_mio.dto.DiscountsDto;
 import com.descuentos.descuentos_mio.repository.DiscountsRepository;
@@ -14,11 +13,9 @@ import java.util.UUID;
 public class DiscountsServiceImpl implements DiscountsService {
 
     private final DiscountsRepository discountsRepository;
-    private final CategoryServiceClient categoryServiceClient;
 
-    public DiscountsServiceImpl(DiscountsRepository discountsRepository, CategoryServiceClient categoryServiceClient) {
+    public DiscountsServiceImpl(DiscountsRepository discountsRepository) {
         this.discountsRepository = discountsRepository;
-        this.categoryServiceClient = categoryServiceClient;
     }
 
     @Override
@@ -63,9 +60,6 @@ public class DiscountsServiceImpl implements DiscountsService {
         }
         if (discount.getCategoryId() == null) {
             throw new IllegalArgumentException("categoryId es obligatorio");
-        }
-        if (categoryServiceClient.findCategoryById(discount.getCategoryId()).isEmpty()) {
-            throw new IllegalArgumentException("categoryId no existe en el servicio externo");
         }
         if (discount.getDescription() == null || discount.getDescription().isBlank()) {
             throw new IllegalArgumentException("description es obligatoria");

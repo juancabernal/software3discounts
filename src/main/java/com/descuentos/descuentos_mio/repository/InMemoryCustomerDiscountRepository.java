@@ -15,14 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryCustomerDiscountRepository implements CustomerDiscountRepository {
 
     private static final UUID LOCATION_ID_1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-    private static final UUID CUSTOMER_ID_1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
-    private static final UUID DISCOUNT_ID_1 = UUID.fromString("90000000-0000-0000-0000-000000000001");
+    private static final UUID CUSTOMER_ID_1 = UUID.fromString("11111111-1111-1111-1111-111111111112");
+    private static final UUID DISCOUNT_ID_1 = UUID.fromString("55e68258-fa94-4a0e-914e-eb935459bfe8");
 
     private final Map<UUID, CustomerDiscountDomain> storage = new ConcurrentHashMap<>();
 
     public InMemoryCustomerDiscountRepository() {
         CustomerDiscountDomain first = new CustomerDiscountDomain(
-                UUID.fromString("70000000-0000-0000-0000-000000000001"),
+                UUID.fromString("70000000-0000-0000-0000-000000000002"),
                 LOCATION_ID_1,
                 CUSTOMER_ID_1,
                 DISCOUNT_ID_1,

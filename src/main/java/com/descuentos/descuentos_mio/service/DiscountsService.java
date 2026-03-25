@@ -16,6 +16,7 @@ public interface DiscountsService {
 
     Optional<DiscountsDto> updateDiscount(UUID id, DiscountsDto discount);
 
+
     Optional<DiscountsDto> updateDiscountStatus(UUID id, Boolean status);
 
     boolean deleteDiscount(UUID id);
