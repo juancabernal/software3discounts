@@ -1,16 +1,21 @@
 package com.co.eatupapi.domain.inventory.location;
 
+import com.co.eatupapi.utils.inventory.location.validation.LocationValidator;
+import lombok.Setter;
+
 public class LocationDomain {
     private String id;
     private String name;
     private String city;
     private String address;
+    @Setter
     private boolean active;
     private String email;
     private String phoneNumber;
-    private ScheduleLocation scheduleLocation;
+    private String startTime;
+    private String endTime;
 
-    public LocationDomain(final String id, final String name, String city, final String address, final boolean active, final String email, final String phoneNumber, final ScheduleLocation scheduleLocation) {
+    public LocationDomain(final String id, final String name, String city, final String address, final boolean active, final String email, final String phoneNumber, final String startTime, final String endTime) {
         setId(id);
         setName(name);
         setCity(city);
@@ -18,7 +23,8 @@ public class LocationDomain {
         setActive(active);
         setEmail(email);
         setPhoneNumber(phoneNumber);
-        setScheduleLocation(scheduleLocation);
+        setStartTime(startTime);
+        setEndTime(endTime);
     }
 
     public String getName() {
@@ -26,7 +32,7 @@ public class LocationDomain {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = LocationValidator.validateName(name);
     }
 
     public String getCity() {
@@ -34,7 +40,7 @@ public class LocationDomain {
     }
 
     public void setCity(String city) {
-        this.city = city;
+        this.city = LocationValidator.validateCity(city);
     }
 
     public String getAddress() {
@@ -42,15 +48,11 @@ public class LocationDomain {
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.address = LocationValidator.validateAddress(address);
     }
 
     public boolean isActive() {
         return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     public String getEmail() {
@@ -58,7 +60,7 @@ public class LocationDomain {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = LocationValidator.validateEmail(email);
     }
 
     public String getPhoneNumber() {
@@ -66,15 +68,23 @@ public class LocationDomain {
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber = LocationValidator.validatePhoneNumber(phoneNumber);
     }
 
-    public ScheduleLocation getScheduleLocation() {
-        return scheduleLocation;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setScheduleLocation(ScheduleLocation scheduleLocation) {
-        this.scheduleLocation = scheduleLocation;
+    public void setStartTime(String startTime) {
+        this.startTime = LocationValidator.validateStartTime(startTime);
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = LocationValidator.validateEndTime(endTime);
     }
 
     public String getId() {
@@ -82,6 +92,6 @@ public class LocationDomain {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.id = LocationValidator.validateId(id);
     }
 }

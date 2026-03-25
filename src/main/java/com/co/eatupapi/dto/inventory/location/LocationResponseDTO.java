@@ -1,6 +1,6 @@
 package com.co.eatupapi.dto.inventory.location;
 
-import com.co.eatupapi.domain.inventory.location.ScheduleLocation;
+import com.co.eatupapi.domain.inventory.location.LocationDomain;
 
 public class LocationResponseDTO {
     private String id;
@@ -10,17 +10,21 @@ public class LocationResponseDTO {
     private boolean active;
     private String email;
     private String phoneNumber;
-    private ScheduleLocation scheduleLocation;
+    private String startTime;
+    private String endTime;
 
-    public LocationResponseDTO(String id, String name, String city, String address, boolean active, String email, String phoneNumber, ScheduleLocation scheduleLocation) {
-        this.id = id;
-        this.name = name;
-        this.city = city;
-        this.address = address;
-        this.active = active;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.scheduleLocation = scheduleLocation;
+    public LocationResponseDTO fromDomain(LocationDomain domain){
+        LocationResponseDTO dto = new LocationResponseDTO();
+        dto.id = domain.getId();
+        dto.name = domain.getName();
+        dto.city = domain.getCity();
+        dto.address = domain.getAddress();
+        dto.active = domain.isActive();
+        dto.email = domain.getEmail();
+        dto.phoneNumber = domain.getPhoneNumber();
+        dto.startTime = domain.getStartTime();
+        dto.endTime = domain.getEndTime();
+        return dto;
     }
 
     public String getId() {return id;}
@@ -30,5 +34,6 @@ public class LocationResponseDTO {
     public boolean isActive() {return active;}
     public String getEmail() {return email;}
     public String getPhoneNumber() {return phoneNumber;}
-    public ScheduleLocation getScheduleLocation() {return scheduleLocation;}
+    public String getStartTime() {return startTime;}
+    public String getEndTime() {return endTime;}
 }
