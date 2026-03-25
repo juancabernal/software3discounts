@@ -4,14 +4,14 @@ import com.co.eatupapi.domain.inventory.categories.CategoryDomain;
 import com.co.eatupapi.domain.inventory.categories.CategoryStatus;
 import com.co.eatupapi.dto.inventory.categories.CategoryDTO;
 import com.co.eatupapi.repositories.inventory.categories.CategoryRepository;
+import com.co.eatupapi.utils.inventory.categories.exceptions.BusinessException;
 import com.co.eatupapi.utils.inventory.categories.exceptions.ResourceNotFoundException;
 import com.co.eatupapi.utils.inventory.categories.exceptions.ValidationException;
 import com.co.eatupapi.utils.inventory.categories.mapper.CategoryMapper;
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,88 +19,87 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final List<CategoryDomain> categories = new ArrayList<>();
 
     public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
     }
 
-    @PostConstruct
-    public void initData() {
-        categories.clear();
-        categories.addAll(categoryRepository.loadInitialCategories());
-    }
-
     public CategoryDTO createCategory(CategoryDTO request, String username) {
         validateCategoryPayload(request);
+        validateCategoryNameDoesNotExist(request.getName());
 
         CategoryDomain categoryDomain = categoryMapper.toDomain(request);
-        categoryDomain.setId(UUID.randomUUID().toString());
-        categoryDomain.setStatus(CategoryStatus.ACTIVE);
+        categoryDomain.setId(UUID.randomUUID());
         categoryDomain.setCreatedBy(username);
+        categoryDomain.setStatus(CategoryStatus.ACTIVE);
         categoryDomain.setCreatedDate(LocalDateTime.now());
         categoryDomain.setModifiedDate(LocalDateTime.now());
 
-        categories.add(categoryDomain);
-        return categoryMapper.toDto(categoryDomain);
+        CategoryDomain savedCategory = categoryRepository.save(categoryDomain);
+        return categoryMapper.toDto(savedCategory);
     }
 
     public CategoryDTO getCategoryById(String categoryId) {
-        CategoryDomain category = findCategoryById(categoryId);
+        CategoryDomain category = categoryRepository.findById(parseUuid(categoryId))
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
+
         return categoryMapper.toDto(category);
     }
 
     public List<CategoryDTO> getCategories(String status) {
         CategoryStatus parsedStatus = parseStatus(status);
 
-        List<CategoryDTO> result = new ArrayList<>();
-        for (CategoryDomain category : categories) {
-            if (parsedStatus == null || category.getStatus() == parsedStatus) {
-                result.add(categoryMapper.toDto(category));
-            }
-        }
-
-        return result;
+        return categoryRepository.findAll().stream()
+                .filter(category -> parsedStatus == null || category.getStatus() == parsedStatus)
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public CategoryDTO updateCategory(String categoryId, CategoryDTO request) {
         validateCategoryPayload(request);
 
-        CategoryDomain existing = findCategoryById(categoryId);
+        CategoryDomain existing = categoryRepository.findById(parseUuid(categoryId))
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
+
+        validateCategoryNameForUpdate(existing, request.getName());
+
         existing.setType(request.getType());
         existing.setName(request.getName());
         existing.setBranchId(request.getBranchId());
         existing.setEntryDate(request.getEntryDate());
         existing.setModifiedDate(LocalDateTime.now());
 
-        return categoryMapper.toDto(existing);
+        CategoryDomain updatedCategory = categoryRepository.save(existing);
+        return categoryMapper.toDto(updatedCategory);
     }
 
     public CategoryDTO updateStatus(String categoryId, String status) {
         CategoryStatus newStatus = parseRequiredStatus(status);
 
-        CategoryDomain existing = findCategoryById(categoryId);
+        CategoryDomain existing = categoryRepository.findById(parseUuid(categoryId))
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
+
         existing.setStatus(newStatus);
         existing.setModifiedDate(LocalDateTime.now());
 
-        return categoryMapper.toDto(existing);
+        CategoryDomain updatedCategory = categoryRepository.save(existing);
+        return categoryMapper.toDto(updatedCategory);
     }
 
-    private CategoryDomain findCategoryById(String categoryId) {
-        for (CategoryDomain category : categories) {
-            if (category.getId().equals(categoryId)) {
-                return category;
-            }
+    private UUID parseUuid(String id) {
+        try {
+            return UUID.fromString(id);
+        } catch (IllegalArgumentException ex) {
+            throw new ValidationException("Invalid category id format");
         }
-
-        throw new ResourceNotFoundException("Category not found with id: " + categoryId);
     }
 
     private CategoryStatus parseStatus(String status) {
         if (status == null || status.isBlank()) {
             return null;
         }
+
         try {
             return CategoryStatus.valueOf(status.trim().toUpperCase());
         } catch (IllegalArgumentException ex) {
@@ -133,5 +132,21 @@ public class CategoryService {
         if (value == null) {
             throw new ValidationException("Field '" + fieldName + "' is required and cannot be empty");
         }
+    }
+
+    private void validateCategoryNameDoesNotExist(String name) {
+        categoryRepository.findByName(name)
+                .ifPresent(category -> {
+                    throw new BusinessException("A category with this name already exists");
+                });
+    }
+
+    private void validateCategoryNameForUpdate(CategoryDomain existing, String requestedName) {
+        categoryRepository.findByName(requestedName)
+                .ifPresent(category -> {
+                    if (!category.getId().equals(existing.getId())) {
+                        throw new BusinessException("A category with this name already exists");
+                    }
+                });
     }
 }

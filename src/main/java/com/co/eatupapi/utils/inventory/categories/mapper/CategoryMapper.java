@@ -2,6 +2,7 @@ package com.co.eatupapi.utils.inventory.categories.mapper;
 
 import com.co.eatupapi.domain.inventory.categories.CategoryDomain;
 import com.co.eatupapi.dto.inventory.categories.CategoryDTO;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -9,7 +10,7 @@ public class CategoryMapper {
 
     public CategoryDTO toDto(CategoryDomain categoryDomain) {
         CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setId(categoryDomain.getId());
+        categoryDTO.setId(categoryDomain.getId() != null ? categoryDomain.getId().toString() : null);
         categoryDTO.setType(categoryDomain.getType());
         categoryDTO.setName(categoryDomain.getName());
         categoryDTO.setBranchId(categoryDomain.getBranchId());
@@ -23,7 +24,11 @@ public class CategoryMapper {
 
     public CategoryDomain toDomain(CategoryDTO dto) {
         CategoryDomain categoryDomain = new CategoryDomain();
-        categoryDomain.setId(dto.getId());
+
+        if (dto.getId() != null && !dto.getId().isBlank()) {
+            categoryDomain.setId(UUID.fromString(dto.getId()));
+        }
+
         categoryDomain.setType(dto.getType());
         categoryDomain.setName(dto.getName());
         categoryDomain.setBranchId(dto.getBranchId());
@@ -35,4 +40,3 @@ public class CategoryMapper {
         return categoryDomain;
     }
 }
-

@@ -1,28 +1,55 @@
 package com.co.eatupapi.domain.inventory.categories;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Entity
+@Table(name = "categories")
 public class CategoryDomain {
 
-    private String id;
+    @Id
+    private UUID id;
+
+    @Column(nullable = false)
     private String type;
+
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false)
     private Long branchId;
+
+    @Column(nullable = false)
     private String createdBy;
+
+    @Column(nullable = false)
     private LocalDate entryDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CategoryStatus status;
+
+    @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    @Column(nullable = false)
     private LocalDateTime modifiedDate;
 
     public CategoryDomain() {
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -90,4 +117,3 @@ public class CategoryDomain {
         this.modifiedDate = modifiedDate;
     }
 }
-

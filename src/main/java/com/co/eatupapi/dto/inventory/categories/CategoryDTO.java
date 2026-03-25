@@ -91,4 +91,3 @@ public class CategoryDTO {
         this.modifiedDate = modifiedDate;
     }
 }
-

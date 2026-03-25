@@ -12,5 +12,3 @@ public class CategoryStatusUpdateDTO {
         this.status = status;
     }
 }
-
-
