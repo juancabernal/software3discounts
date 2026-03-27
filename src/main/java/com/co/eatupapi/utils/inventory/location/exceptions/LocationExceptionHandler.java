@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -33,6 +34,23 @@ public class LocationExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
         LocationValidationException validationException = new LocationValidationException(ex.getMessage());
         return buildErrorResponse(validationException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .distinct()
+                .reduce((first, second) -> first + ", " + second)
+                .orElse("Solicitud inválida");
+
+        return buildRawErrorResponse(
+                message,
+                "VALIDATION_ERROR",
+                HttpStatus.BAD_REQUEST
+        );
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
