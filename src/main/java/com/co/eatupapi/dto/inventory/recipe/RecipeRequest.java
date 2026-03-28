@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateRecipeRequest {
+public class RecipeRequest {
 
     @NotBlank
     private String name;
