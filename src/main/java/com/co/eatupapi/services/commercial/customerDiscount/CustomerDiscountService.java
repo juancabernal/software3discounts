@@ -1,0 +1,21 @@
+package com.co.eatupapi.services.commercial.customerDiscount;
+
+
+import com.co.eatupapi.dto.commercial.customerDiscount.CustomerDiscountDTO;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public interface CustomerDiscountService {
+
+    List<CustomerDiscountDTO> getAllCustomerDiscounts();
+
+    List<CustomerDiscountDTO> getDiscountsByCustomerId(UUID customerId);
+
+    CustomerDiscountDTO createCustomerDiscount(CustomerDiscountDTO customerDiscount);
+
+    Optional<CustomerDiscountDTO> updateCustomerDiscount(UUID id, CustomerDiscountDTO customerDiscount);
+
+    boolean deleteCustomerDiscount(UUID id);
+}
