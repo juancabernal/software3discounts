@@ -6,7 +6,6 @@ import com.co.eatupapi.services.payment.cashreceipt.CashReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -33,10 +32,10 @@ public class CashReceiptController {
             summary = "Aplicar pago a una factura",
             description = "Crea un recibo de caja asociado a una factura pendiente. El invoiceId debe corresponder a una factura existente en el módulo de facturas."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Recibo creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos en el request")
-    })
+
+    @ApiResponse(responseCode = "201", description = "Recibo creado exitosamente")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos en el request")
+
     @PostMapping
     public ResponseEntity<CashReceiptResponse> createCashReceipt(
             @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
@@ -50,9 +49,9 @@ public class CashReceiptController {
             summary = "Listar recibos de caja",
             description = "Retorna los recibos de caja de un sitio con paginación."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
-    })
+
+    @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
+
     @GetMapping
     public ResponseEntity<Page<CashReceiptResponse>> getCashReceipts(
             @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
@@ -67,11 +66,11 @@ public class CashReceiptController {
             summary = "Anular recibo de caja",
             description = "Cambia el estado del recibo a CANCELLED y registra la fecha de anulación."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Recibo anulado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "El recibo ya fue anulado previamente"),
-            @ApiResponse(responseCode = "404", description = "Recibo no encontrado")
-    })
+
+    @ApiResponse(responseCode = "200", description = "Recibo anulado exitosamente")
+    @ApiResponse(responseCode = "400", description = "El recibo ya fue anulado previamente")
+    @ApiResponse(responseCode = "404", description = "Recibo no encontrado")
+
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<CashReceiptResponse> cancelCashReceipt(
