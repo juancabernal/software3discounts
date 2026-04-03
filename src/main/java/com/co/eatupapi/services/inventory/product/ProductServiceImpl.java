@@ -115,7 +115,7 @@ public class ProductServiceImpl implements ProductService {
         if (request.getLocation() != null && !request.getLocation().isBlank()) {
             product.setLocation(request.getLocation());
         }
-        if (request.getUnitOfMeasure() != null && !request.getUnitOfMeasure().isBlank()) {
+        if (request.getUnitOfMeasure() != null) {
             product.setUnitOfMeasure(request.getUnitOfMeasure());
         }
 
@@ -241,7 +241,7 @@ public class ProductServiceImpl implements ProductService {
         if (request.getLocation() == null || request.getLocation().isBlank()) {
             throw new ValidationException("La sede del producto es obligatoria");
         }
-        if (request.getUnitOfMeasure() == null || request.getUnitOfMeasure().isBlank()) {
+        if (request.getUnitOfMeasure() == null ) {
             throw new ValidationException("La unidad de medida es obligatoria");
         }
         if (request.getSalePrice() == null) {
