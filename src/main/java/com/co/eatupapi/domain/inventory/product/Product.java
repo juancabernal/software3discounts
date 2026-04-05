@@ -23,8 +23,9 @@ public class Product {
     @Column(nullable = false)
     private String location;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String unitOfMeasure;
+    private UnitOfMeasure unitOfMeasure;
 
     @Column(nullable = false, precision = 15, scale = 3)
     private BigDecimal salePrice;
@@ -47,8 +48,8 @@ public class Product {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 
-    public String getUnitOfMeasure() { return unitOfMeasure; }
-    public void setUnitOfMeasure(String unitOfMeasure) { this.unitOfMeasure = unitOfMeasure; }
+    public UnitOfMeasure getUnitOfMeasure() { return unitOfMeasure; }
+    public void setUnitOfMeasure(UnitOfMeasure unitOfMeasure) { this.unitOfMeasure = unitOfMeasure; }
 
     public BigDecimal getSalePrice() { return salePrice; }
     public void setSalePrice(BigDecimal salePrice) { this.salePrice = salePrice; }
