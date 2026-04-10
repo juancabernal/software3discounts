@@ -20,7 +20,9 @@ public class SellerDTO {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public SellerDTO() {}
+    public SellerDTO() {
+        // Default constructor required for JSON deserialization
+    }
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

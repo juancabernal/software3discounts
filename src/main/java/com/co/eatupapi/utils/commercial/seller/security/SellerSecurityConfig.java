@@ -31,6 +31,7 @@ public class SellerSecurityConfig {
 
     @Bean
     @Order(0)
+    @SuppressWarnings({"java:S112", "java:S1130"}) // Spring Security API requires throws Exception
     public SecurityFilterChain sellerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/comercialapi/v1/sellers/**")

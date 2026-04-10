@@ -48,7 +48,9 @@ public class SellerDomain {
     @Column(name = "modified_date", nullable = false)
     private LocalDateTime modifiedDate;
 
-    public SellerDomain() {}
+    public SellerDomain() {
+        // Default constructor required by JPA
+    }
 
 
 
