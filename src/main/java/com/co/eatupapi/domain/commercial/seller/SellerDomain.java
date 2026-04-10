@@ -14,8 +14,8 @@ public class SellerDomain {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "document_type", nullable = false, length = 10)
-    private String documentType;
+    @Column(name = "document_type_id", nullable = false)
+    private UUID documentTypeId;
 
     @Column(name = "location_id", nullable = false)
     private Long locationId;
@@ -55,13 +55,9 @@ public class SellerDomain {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public String getDocumentType() {
-        return documentType;
-    }
+    public UUID getDocumentTypeId() { return documentTypeId; }
+    public void setDocumentTypeId(UUID documentTypeId) { this.documentTypeId = documentTypeId; }
 
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
-    }
 
     public Long getLocationId() {
         return locationId;

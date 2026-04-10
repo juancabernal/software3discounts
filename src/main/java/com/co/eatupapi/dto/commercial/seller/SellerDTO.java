@@ -8,7 +8,7 @@ import java.util.UUID;
 public class SellerDTO {
 
     private UUID id;
-    private String documentType;
+    private UUID documentTypeId;
     private Long locationId;
     private String identificationNumber;
     private String firstName;
@@ -26,13 +26,9 @@ public class SellerDTO {
     public void setId(UUID id) { this.id = id; }
 
 
-    public String getDocumentType() {
-        return documentType;
-    }
+    public UUID getDocumentTypeId() { return documentTypeId; }
+    public void setDocumentTypeId(UUID documentTypeId) { this.documentTypeId = documentTypeId; }
 
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
-    }
 
     public Long getLocationId() {
         return locationId;

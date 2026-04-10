@@ -8,8 +8,10 @@ import com.co.eatupapi.utils.commercial.seller.exceptions.SellerBusinessExceptio
 import com.co.eatupapi.utils.commercial.seller.exceptions.SellerNotFoundException;
 import com.co.eatupapi.utils.commercial.seller.exceptions.SellerValidationException;
 import com.co.eatupapi.utils.commercial.seller.mapper.SellerMapper;
+import com.co.eatupapi.repositories.user.DocumentTypeRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -23,13 +25,18 @@ public class SellerService {
     private static final Pattern DIGITS_PATTERN = Pattern.compile("^\\d+$");
     private static final double MAX_COMMISSION = 30.0;
     private static final double MIN_COMMISSION = 0.0;
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$");
 
+    private final DocumentTypeRepository documentTypeRepository;
     private final SellerRepository sellerRepository;
     private final SellerMapper sellerMapper;
 
-    public SellerService(SellerRepository sellerRepository, SellerMapper sellerMapper) {
+    public SellerService(SellerRepository sellerRepository,
+                         SellerMapper sellerMapper,
+                         DocumentTypeRepository documentTypeRepository) {
         this.sellerRepository = sellerRepository;
         this.sellerMapper = sellerMapper;
+        this.documentTypeRepository = documentTypeRepository;
     }
 
     public SellerDTO createSeller(SellerDTO request) {
@@ -68,7 +75,7 @@ public class SellerService {
         SellerDomain existing = findSellerById(sellerId);
         validateImmutableEmail(existing.getEmail(), request.getEmail());
 
-        existing.setDocumentType(request.getDocumentType());
+        existing.setDocumentTypeId(request.getDocumentTypeId());
         existing.setLocationId(request.getLocationId());
         existing.setIdentificationNumber(request.getIdentificationNumber());
         existing.setFirstName(request.getFirstName());
@@ -113,7 +120,8 @@ public class SellerService {
     }
 
     private void validateSellerPayload(SellerDTO request) {
-        validateRequiredText(request.getDocumentType(), "documentType");
+        validateRequiredObject(request.getDocumentTypeId(), "documentTypeId");
+        validateDocumentType(request.getDocumentTypeId());
         validateRequiredObject(request.getLocationId(), "locationId");
         validateRequiredText(request.getIdentificationNumber(), "identificationNumber");
         validateRequiredText(request.getFirstName(), "firstName");
@@ -125,11 +133,37 @@ public class SellerService {
         validateEmail(request.getEmail());
         validatePhone(request.getPhone());
         validateCommissionPercentage(request.getCommissionPercentage());
+
+        validateIdentificationNumber(request.getIdentificationNumber());
+        validateName(request.getFirstName(), "firstName");
+        validateName(request.getLastName(), "lastName");
     }
 
     private void validateRequiredText(String value, String fieldName) {
         if (value == null || value.isBlank()) {
             throw new SellerValidationException("Field '" + fieldName + "' is required and cannot be empty");
+        }
+    }
+    private void validateDocumentType(UUID documentTypeId) {
+        if (!documentTypeRepository.existsById(documentTypeId)) {
+            throw new SellerValidationException(
+                    "Document type not found with id: " + documentTypeId
+            );
+        }
+    }
+    private void validateIdentificationNumber(String number) {
+        if (!DIGITS_PATTERN.matcher(number).matches()) {
+            throw new SellerValidationException("Identification number must contain only digits");
+        }
+        if (number.length() < 6 || number.length() > 20) {
+            throw new SellerValidationException("Identification number must be between 6 and 20 digits");
+        }
+    }
+    private void validateName(String value, String fieldName) {
+        if (!NAME_PATTERN.matcher(value.trim()).matches()) {
+            throw new SellerValidationException(
+                    "Field '" + fieldName + "' must contain only letters"
+            );
         }
     }
 
@@ -165,6 +199,10 @@ public class SellerService {
         }
         if (commission > MAX_COMMISSION) {
             throw new SellerValidationException("Commission percentage cannot exceed 30%");
+        }
+        BigDecimal bd = BigDecimal.valueOf(commission).stripTrailingZeros();
+        if (bd.scale() > 2) {
+            throw new SellerValidationException("Commission percentage must have at most 2 decimal places");
         }
     }
 
