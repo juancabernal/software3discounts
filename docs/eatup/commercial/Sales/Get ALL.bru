@@ -11,11 +11,17 @@ get {
 }
 
 auth:bearer {
-<<<<<<< HEAD
-  token: {{token}}
-=======
   token: 
->>>>>>> 74657d5 (refactor(sales): corrección de incidencias SonarQube y optimización de lógica de negocio)
+}
+
+script:post-response {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("La respuesta es un array", function() {
+    expect(res.getBody()).to.be.an('array');
+  });
 }
 
 settings {

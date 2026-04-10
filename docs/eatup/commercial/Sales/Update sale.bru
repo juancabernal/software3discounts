@@ -27,6 +27,17 @@ vars:pre-request {
   id: 01cbf745-8dd1-484d-b0b0-5f2b5df61811
 }
 
+script:post-response {
+  test("Actualización exitosa", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Monto total es válido", function() {
+    const data = res.getBody();
+    expect(data.totalAmount).to.be.greaterThan(0);
+  });
+}
+
 settings {
   encodeUrl: true
   timeout: 0
