@@ -26,7 +26,7 @@ public class CashReceiptSecurityConfig {
     public SecurityFilterChain cashReceiptSecurityFilterChain(HttpSecurity http) throws ServletException {
         try {
             http
-                    .securityMatcher("/api/v1/sites/*/cashreceipts/**")
+                    .securityMatcher("/api/v1/locations/*/cashreceipts/**")
                     .csrf(AbstractHttpConfigurer::disable)
                     .sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

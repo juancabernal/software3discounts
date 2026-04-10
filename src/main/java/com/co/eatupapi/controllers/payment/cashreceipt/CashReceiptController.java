@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sites/{siteId}/cashreceipts")
+@RequestMapping("/api/v1/locations/{locationId}/cashreceipts")
 @Tag(name = "Recibos de Caja", description = "Gestión de pagos aplicados a facturas pendientes")
 public class CashReceiptController {
 
@@ -38,10 +38,10 @@ public class CashReceiptController {
 
     @PostMapping
     public ResponseEntity<CashReceiptResponse> createCashReceipt(
-            @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
+            @Parameter(description = "ID del sitio") @PathVariable UUID locationId,
             @Valid @RequestBody CreateCashReceiptRequest request) {
 
-        CashReceiptResponse response = cashReceiptService.createCashReceipt(siteId, request);
+        CashReceiptResponse response = cashReceiptService.createCashReceipt(locationId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -54,12 +54,12 @@ public class CashReceiptController {
 
     @GetMapping
     public ResponseEntity<Page<CashReceiptResponse>> getCashReceipts(
-            @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
+            @Parameter(description = "ID del sitio") @PathVariable UUID locationId,
             @Parameter(description = "Número de página (inicia en 0)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Cantidad de resultados por página") @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(cashReceiptService.getCashReceiptsBySite(siteId, pageable));
+        return ResponseEntity.ok(cashReceiptService.getCashReceiptsBySite(locationId, pageable));
     }
 
     @Operation(
@@ -74,9 +74,9 @@ public class CashReceiptController {
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<CashReceiptResponse> cancelCashReceipt(
-            @Parameter(description = "ID del sitio") @PathVariable UUID siteId,
+            @Parameter(description = "ID del sitio") @PathVariable UUID locationId,
             @Parameter(description = "ID del recibo a anular") @PathVariable UUID id) {
 
-        return ResponseEntity.ok(cashReceiptService.cancelCashReceipt(siteId, id));
+        return ResponseEntity.ok(cashReceiptService.cancelCashReceipt(locationId, id));
     }
 }
