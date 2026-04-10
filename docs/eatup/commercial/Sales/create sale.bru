@@ -1,0 +1,34 @@
+meta {
+  name: create sale
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/commercial/api/v1/sales
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbmRyZXNAY29ycmVvLmNvbSIsImlhdCI6MTc3NTY5NjgxOCwiZXhwIjoxNzc1NzAwNDE4fQ.iPP7N1g0YDZpu3y3kYitR8-eXbGPB3J9YJJnpZ72TzFzD4XjhwYlJ1UgTtp3KCNw
+}
+
+body:json {
+  {
+    "sellerId": "d2dc7423-3205-4599-bb14-f1341bf48fb0",
+    "tableId": "a862fff9-f0c8-400e-9b22-876d20130f95",
+    "details": [
+      {
+        "productId": "b87734c7-7448-4ebd-a70c-0fdf28e35cb5",
+        "quantity": 2,
+        "unitPrice": 15000.00
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

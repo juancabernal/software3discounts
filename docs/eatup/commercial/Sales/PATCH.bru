@@ -1,0 +1,26 @@
+meta {
+  name: PATCH
+  type: http
+  seq: 5
+}
+
+patch {
+  url: http://localhost:8080/commercial/api/v1/sales/{{id}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status": "CREATED"
+  }
+}
+
+vars:pre-request {
+  id: 584affad-eb34-4b71-a6eb-a28a4d2e267a
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
