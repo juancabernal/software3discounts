@@ -15,10 +15,10 @@ headers {
 }
 
 body:json {
-  {
-    "email": "laura.gomez@example.com",
-    "password": "Salome123"
-  }
+    {
+      "email": "{{loginEmail}}",
+      "password": "{{loginPassword}}"
+    }
 }
 
 vars:pre-request {
