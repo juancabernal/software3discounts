@@ -15,16 +15,28 @@ public class UpdateRecipeService {
 
     private final RecipeRepository repo;
     private final RecipeMapper mapper;
+    private final RecipeValidatorService recipeValidator;
+    private final RecipeExistenceValidatorService existenceValidator;
 
-    public UpdateRecipeService(RecipeRepository repo, RecipeMapper mapper) {
+    public UpdateRecipeService(
+            RecipeRepository repo,
+            RecipeMapper mapper,
+            RecipeValidatorService recipeValidator,
+            RecipeExistenceValidatorService existenceValidator
+    ) {
         this.repo = repo;
         this.mapper = mapper;
+        this.recipeValidator = recipeValidator;
+        this.existenceValidator = existenceValidator;
     }
 
     @Transactional
-    public void run(RecipeRequest recipe) {
-        var existingRecipe = this.getExistingRecipe(recipe.getName());
-        mapper.toUpdatedDomain(recipe, existingRecipe);
+    public void run(RecipeRequest request) {
+        existenceValidator.run(request.getSubRecipeIds());
+
+        RecipeDomain existingRecipe = getExistingRecipe(request.getName());
+        mapper.toUpdatedDomain(request, existingRecipe);
+        recipeValidator.validate(existingRecipe);
         repo.save(existingRecipe);
     }
 
