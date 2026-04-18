@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/recipes")
@@ -23,14 +25,16 @@ public class RecipeController {
     private final UpdateRecipeService updateService;
     private final DeleteRecipeService deleteService;
     private final ListRecipesService listService;
+    private final GetRecipeByIdService getByIdService;
 
     public RecipeController(CreateRecipeService createService, GetRecipeService getService,
-                            UpdateRecipeService updateService, DeleteRecipeService deleteService, ListRecipesService listService) {
+                            UpdateRecipeService updateService, DeleteRecipeService deleteService, ListRecipesService listService, GetRecipeByIdService getByIdService) {
         this.createService = createService;
         this.getService = getService;
         this.updateService = updateService;
         this.deleteService = deleteService;
         this.listService = listService;
+        this.getByIdService = getByIdService;
     }
 
     @Operation(
@@ -40,6 +44,7 @@ public class RecipeController {
     @ApiResponse(responseCode = "201", description = "Receta creada exitosamente.")
     @PostMapping
     public ResponseEntity<Void> createRecipe(
+            @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = @Content(
@@ -72,7 +77,7 @@ public class RecipeController {
 
     @Operation(
             summary = "Obtener receta por nombre",
-            description = "Retorna la información completa de una receta dado su nombre."
+            description = "Busca una receta por nombre usando query param."
     )
     @ApiResponse(
             responseCode = "200",
@@ -88,22 +93,22 @@ public class RecipeController {
             content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(value = """
-                {
-                  "error": "RECIPE_NOT_FOUND",
-                  "message": "La receta con el nombre Pizza no fue encontrada.",
-                  "timestamp": "2026-04-09T12:00:00"
-                }
-            """)
+        {
+          "error": "RECIPE_NOT_FOUND",
+          "message": "La receta con el nombre Pizza Margarita no existe.",
+          "timestamp": "2026-04-16T12:00:00"
+        }
+        """)
             )
     )
-    @GetMapping("/{name}")
-    public ResponseEntity<RecipeResponse> getRecipe(
+    @GetMapping(params = "name")
+    public ResponseEntity<RecipeResponse> getByName(
             @Parameter(
-                    description = "Nombre único de la receta",
+                    description = "Nombre de la receta",
                     example = "Pizza Margarita",
                     required = true
             )
-            @PathVariable String name
+            @RequestParam String name
     ) {
         return ResponseEntity.ok(getService.run(name));
     }
@@ -116,6 +121,7 @@ public class RecipeController {
     @ApiResponse(responseCode = "404", description = "Receta no encontrada.")
     @PutMapping
     public ResponseEntity<Void> updateRecipe(
+            @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = @Content(
@@ -182,5 +188,43 @@ public class RecipeController {
     @GetMapping
     public ResponseEntity<List<RecipeResponse>> listRecipes() {
         return ResponseEntity.ok(listService.run());
+    }
+
+    @Operation(
+            summary = "Obtener receta por ID",
+            description = "Retorna la información completa de una receta dado su UUID."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Receta encontrada",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecipeResponse.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Receta no encontrada",
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+        {
+          "error": "RECIPE_NOT_FOUND",
+          "message": "La receta con el id b2a9452c-b820-45f9-a426-a42bdf75b24b no existe.",
+          "timestamp": "2026-04-16T12:00:00"
+        }
+        """)
+            )
+    )
+    @GetMapping("/{id}")
+    public ResponseEntity<RecipeResponse> getById(
+            @Parameter(
+                    description = "UUID de la receta",
+                    example = "b2a9452c-b820-45f9-a426-a42bdf75b24b",
+                    required = true
+            )
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(getByIdService.run(id));
     }
 }

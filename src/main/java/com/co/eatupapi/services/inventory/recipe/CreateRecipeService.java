@@ -1,5 +1,6 @@
 package com.co.eatupapi.services.inventory.recipe;
 
+import com.co.eatupapi.domain.inventory.recipe.RecipeDomain;
 import com.co.eatupapi.dto.inventory.recipe.RecipeRequest;
 import com.co.eatupapi.repositories.inventory.recipe.RecipeRepository;
 import com.co.eatupapi.utils.inventory.recipe.exceptions.ErrorCode;
@@ -18,22 +19,31 @@ public class CreateRecipeService {
     private final RecipeRepository repo;
     private final RecipeMapper mapper;
     private final GenerateRecipeIdService idService;
+    private final RecipeValidatorService recipeValidator;
+    private final RecipeExistenceValidatorService existenceValidator;
 
     public CreateRecipeService(
             RecipeRepository repo,
             RecipeMapper mapper,
-            GenerateRecipeIdService idService
+            GenerateRecipeIdService idService,
+            RecipeValidatorService recipeValidator,
+            RecipeExistenceValidatorService existenceValidator
     ) {
         this.repo = repo;
         this.mapper = mapper;
         this.idService = idService;
+        this.recipeValidator = recipeValidator;
+        this.existenceValidator = existenceValidator;
     }
 
     @Transactional
-    public void run(RecipeRequest recipe) {
-        this.validatePreviousExistence(recipe.getName());
+    public void run(RecipeRequest request) {
+        validatePreviousExistence(request.getName());
+        existenceValidator.run(request.getSubRecipeIds());
         UUID id = idService.run();
-        repo.save(mapper.toNewDomain(recipe, id));
+        RecipeDomain recipe = mapper.toNewDomain(request, id);
+        recipeValidator.validate(recipe);
+        repo.save(recipe);
     }
 
     private void validatePreviousExistence(String name) {
