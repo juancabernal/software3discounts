@@ -1,0 +1,33 @@
+meta {
+  name: Actualizar cliente
+  type: http
+  seq: 8
+}
+
+put {
+  url: http://localhost:8080/commercial/api/v1/clients/{id}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "address": "Calle 10 #20-30",
+      "applyDiscounts": true,
+      "assignedSellerId": 2,
+      "cityId": "aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa",
+      "documentTypeId": "11111111-aaaa-aaaa-aaaa-111111111111",
+      "firstLastName": "Perez",
+      "firstName": "Juan",
+      "id": "b9de0840-ea37-4afc-b70a-85fe55cb77c5",
+      "phone": "3001234567",
+      "secondLastName": "Gomez",
+      "secondName": "Carlos",
+      "taxRegimeId": "036ffcc6-bb3f-487e-ba99-9b5376864456"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

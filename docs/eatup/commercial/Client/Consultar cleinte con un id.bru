@@ -1,0 +1,20 @@
+meta {
+  name: Consultar cleinte con un id
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/commercial/api/v1/clients/{id}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJsYXVyYS5nb21lekBleGFtcGxlLmNvbSIsImlhdCI6MTc3NjUyNTg2NywiZXhwIjoxNzc2NTI5NDY3fQ.wDWi16DmxA1rn2GYpP9kJrYR7OkB5MTdj10w3pulDDmZBcw7SElG38bYb9oojUEf
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

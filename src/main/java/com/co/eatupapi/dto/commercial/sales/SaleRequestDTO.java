@@ -5,6 +5,7 @@ import java.util.List;
 public class SaleRequestDTO {
 
     private String sellerId;
+    private String locationId;
     private String tableId;
     private List<SaleDetailDTO> details;
 
@@ -14,6 +15,14 @@ public class SaleRequestDTO {
 
     public void setSellerId(String sellerId) {
         this.sellerId = sellerId;
+    }
+
+    public String getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
     }
 
     public String getTableId() {

@@ -4,14 +4,15 @@ import com.co.eatupapi.domain.commercial.sales.SaleDetailDomain;
 import com.co.eatupapi.domain.commercial.sales.SaleDomain;
 import com.co.eatupapi.domain.commercial.sales.SaleStatus;
 import com.co.eatupapi.domain.commercial.seller.SellerDomain;
-import com.co.eatupapi.domain.inventory.product.Product;
+import com.co.eatupapi.domain.inventory.recipe.RecipeDomain;
 import com.co.eatupapi.dto.commercial.sales.SaleDetailDTO;
 import com.co.eatupapi.dto.commercial.sales.SalePatchDTO;
 import com.co.eatupapi.dto.commercial.sales.SaleRequestDTO;
 import com.co.eatupapi.dto.commercial.sales.SaleResponseDTO;
 import com.co.eatupapi.repositories.commercial.sales.SaleRepository;
 import com.co.eatupapi.repositories.commercial.seller.SellerRepository;
-import com.co.eatupapi.repositories.inventory.product.ProductRepository;
+import com.co.eatupapi.repositories.inventory.location.LocationRepository;
+import com.co.eatupapi.repositories.inventory.recipe.RecipeRepository;
 import com.co.eatupapi.services.commercial.table.TableService;
 import com.co.eatupapi.utils.commercial.sales.exceptions.SaleBusinessException;
 import com.co.eatupapi.utils.commercial.sales.exceptions.SaleNotFoundException;
@@ -31,22 +32,26 @@ public class SaleServiceImpl implements SaleService {
 
     private static final String SALE_NOT_FOUND_MSG = "Sale not found with id: ";
     private static final String SELLER_NOT_FOUND_MSG = "Seller not found with id: ";
-    private static final String PRODUCT_NOT_FOUND_MSG = "Product not found with id: ";
+    private static final String RECIPE_NOT_FOUND_MSG = "Recipe not found with id: ";
+    private static final String LOCATION_NOT_FOUND_MSG = "Location not found with id: ";
 
     private final SaleRepository saleRepository;
     private final SellerRepository sellerRepository;
-    private final ProductRepository productRepository;
+    private final RecipeRepository recipeRepository;
+    private final LocationRepository locationRepository;
     private final TableService tableService;
     private final SaleMapper saleMapper;
 
     public SaleServiceImpl(SaleRepository saleRepository,
                            SellerRepository sellerRepository,
-                           ProductRepository productRepository,
+                           RecipeRepository recipeRepository,
+                           LocationRepository locationRepository,
                            TableService tableService,
                            SaleMapper saleMapper) {
         this.saleRepository = saleRepository;
         this.sellerRepository = sellerRepository;
-        this.productRepository = productRepository;
+        this.recipeRepository = recipeRepository;
+        this.locationRepository = locationRepository;
         this.tableService = tableService;
         this.saleMapper = saleMapper;
     }
@@ -58,12 +63,16 @@ public class SaleServiceImpl implements SaleService {
         SellerDomain seller = sellerRepository.findById(UUID.fromString(request.getSellerId()))
                 .orElseThrow(() -> new SaleNotFoundException(SELLER_NOT_FOUND_MSG + request.getSellerId()));
 
+        var location = locationRepository.findById(request.getLocationId())
+                .orElseThrow(() -> new SaleNotFoundException(LOCATION_NOT_FOUND_MSG + request.getLocationId()));
+
         if (request.getTableId() != null && !request.getTableId().isBlank()) {
             validateTableExists(request.getTableId());
         }
 
         SaleDomain sale = new SaleDomain();
         sale.setSeller(seller);
+        sale.setLocation(location);
         sale.setTableId(request.getTableId());
         sale.setStatus(SaleStatus.CREATED);
         sale.setCreatedDate(LocalDateTime.now());
@@ -88,13 +97,13 @@ public class SaleServiceImpl implements SaleService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (SaleDetailDTO detailDto : detailDtos) {
-            Product product = productRepository.findById(detailDto.getProductId())
-                    .orElseThrow(() -> new SaleNotFoundException(PRODUCT_NOT_FOUND_MSG + detailDto.getProductId()));
+            RecipeDomain recipe = recipeRepository.findById(detailDto.getRecipeId())
+                    .orElseThrow(() -> new SaleNotFoundException(RECIPE_NOT_FOUND_MSG + detailDto.getRecipeId()));
 
             SaleDetailDomain detail = new SaleDetailDomain();
-            detail.setProduct(product);
+            detail.setRecipe(recipe);
             detail.setQuantity(detailDto.getQuantity());
-            detail.setUnitPrice(detailDto.getUnitPrice() != null ? detailDto.getUnitPrice() : product.getSalePrice());
+            detail.setUnitPrice(detailDto.getUnitPrice() != null ? detailDto.getUnitPrice() : recipe.getSellingPrice());
 
             BigDecimal subtotal = detail.getUnitPrice().multiply(detail.getQuantity());
             detail.setSubtotal(subtotal);
@@ -134,11 +143,15 @@ public class SaleServiceImpl implements SaleService {
         SellerDomain seller = sellerRepository.findById(UUID.fromString(request.getSellerId()))
                 .orElseThrow(() -> new SaleNotFoundException(SELLER_NOT_FOUND_MSG + request.getSellerId()));
 
+        var location = locationRepository.findById(request.getLocationId())
+                .orElseThrow(() -> new SaleNotFoundException(LOCATION_NOT_FOUND_MSG + request.getLocationId()));
+
         if (request.getTableId() != null && !request.getTableId().isBlank()) {
             validateTableExists(request.getTableId());
         }
 
         existingSale.setSeller(seller);
+        existingSale.setLocation(location);
         existingSale.setTableId(request.getTableId());
         existingSale.setModifiedDate(LocalDateTime.now());
 
@@ -181,6 +194,12 @@ public class SaleServiceImpl implements SaleService {
             existingSale.setSeller(seller);
         }
 
+        if (request.locationId() != null && !request.locationId().isBlank()) {
+            var location = locationRepository.findById(request.locationId())
+                    .orElseThrow(() -> new SaleNotFoundException(LOCATION_NOT_FOUND_MSG + request.locationId()));
+            existingSale.setLocation(location);
+        }
+
         if (request.tableId() != null) {
             if (!request.tableId().isBlank()) {
                 validateTableExists(request.tableId());
@@ -213,12 +232,15 @@ public class SaleServiceImpl implements SaleService {
         if (request.getSellerId() == null || request.getSellerId().isBlank()) {
             throw new SaleValidationException("Seller ID is required");
         }
+        if (request.getLocationId() == null || request.getLocationId().isBlank()) {
+            throw new SaleValidationException("Location ID is required");
+        }
         if (request.getDetails() == null || request.getDetails().isEmpty()) {
             throw new SaleBusinessException("A sale must have at least one item");
         }
         for (SaleDetailDTO detail : request.getDetails()) {
-            if (detail.getProductId() == null) {
-                throw new SaleValidationException("Product ID is required for all items");
+            if (detail.getRecipeId() == null) {
+                throw new SaleValidationException("Recipe ID is required for all items");
             }
             if (detail.getQuantity() == null || detail.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new SaleValidationException("Quantity must be greater than zero for all items");

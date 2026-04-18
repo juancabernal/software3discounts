@@ -1,0 +1,35 @@
+meta {
+  name: Crear cliente
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8080/commercial/api/v1/clients
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "Juan",
+    "secondName": "Carlos",
+    "firstLastName": "Perez",
+    "secondLastName": "Gomez",
+    "documentTypeId": "11111111-aaaa-aaaa-aaaa-111111111111",
+    "documentNumber": "123556789",
+    "email": "juan12@email.com",
+    "phone": "3001234567",
+    "address": "Calle 10 #20-30",
+    "cityId": "aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa",
+    "taxRegimeId": "036ffcc6-bb3f-487e-ba99-9b5376864456",
+    "assignedSellerId": 1,
+    "applyDiscounts": true
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

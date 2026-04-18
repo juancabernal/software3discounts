@@ -7,11 +7,15 @@ meta {
 delete {
   url: http://localhost:8080/commercial/api/v1/sales/{{id}}
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbGVqc0Bjb3JyZW8uY29tIiwiaWF0IjoxNzc1OTEzODA1LCJleHAiOjE3NzU5MTc0MDV9.08ZQN7AQxldaN_yDsnQBHCh83zOFvSB0fdIuQ5tIyFX_yqUBeVMe_YPEq-JcX57l
 }
 
 vars:pre-request {
-  id: ddfab038-5488-4ede-b7b2-e2dfb5fe8427
+  id: 20ffb3a5-dc5c-4f73-a375-3894b31b7407
 }
 
 script:post-response {
