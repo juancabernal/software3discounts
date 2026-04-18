@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,42 +31,48 @@ public class CategorySecurityConfig {
 
     @Bean
     @Order(0)
-    public SecurityFilterChain categorySecurityFilterChain(HttpSecurity http) {
-        try {
-            http
-                    .securityMatcher("/inventory/api/v1/categories/**")
-                    .csrf(AbstractHttpConfigurer::disable)
-                    .formLogin(AbstractHttpConfigurer::disable)
-                    .httpBasic(AbstractHttpConfigurer::disable)
-                    .sessionManagement(session -> session
-                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .exceptionHandling(exception -> exception
-                            .authenticationEntryPoint((request, response, authException) ->
-                                    writeSecurityErrorResponse(
-                                            response,
-                                            HttpStatus.UNAUTHORIZED,
-                                            "Authentication is required to access this resource",
-                                            "USER_UNAUTHORIZED"
-                                    )
-                            )
-                    )
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(HttpMethod.POST, "/inventory/api/v1/categories/users/**").permitAll()
-                            .anyRequest().authenticated()
-                    )
-                    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain categorySecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/inventory/api/v1/categories/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) ->
+                                writeSecurityErrorResponse(
+                                        response,
+                                        HttpStatus.UNAUTHORIZED,
+                                        "Token requerido para acceder a este recurso",
+                                        "CATEGORY_UNAUTHORIZED"
+                                )
+                        )
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                writeSecurityErrorResponse(
+                                        response,
+                                        HttpStatus.FORBIDDEN,
+                                        "No tienes permisos para realizar esta acción",
+                                        "CATEGORY_FORBIDDEN"
+                                )
+                        )
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-            return http.build();
-        } catch (Exception e) {
-            throw new IllegalStateException("Error al configurar el SecurityFilterChain de Categorías", e);
-        }
+        return http.build();
     }
 
     private void writeSecurityErrorResponse(HttpServletResponse response,
                                             HttpStatus status,
                                             String message,
                                             String errorCode) throws IOException {
-        if (response.isCommitted()) return;
+        if (response.isCommitted()) {
+            return;
+        }
 
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
