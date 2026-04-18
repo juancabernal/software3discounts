@@ -5,26 +5,26 @@ import java.util.UUID;
 
 public class SaleDetailDTO {
 
-    private UUID productId;
-    private String productName;
+    private UUID recipeId;
+    private String recipeName;
     private BigDecimal quantity;
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
 
-    public UUID getProductId() {
-        return productId;
+    public UUID getRecipeId() {
+        return recipeId;
     }
 
-    public void setProductId(UUID productId) {
-        this.productId = productId;
+    public void setRecipeId(UUID recipeId) {
+        this.recipeId = recipeId;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getRecipeName() {
+        return recipeName;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
     }
 
     public BigDecimal getQuantity() {
