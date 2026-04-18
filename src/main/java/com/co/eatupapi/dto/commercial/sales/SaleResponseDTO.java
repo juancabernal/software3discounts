@@ -11,6 +11,8 @@ public class SaleResponseDTO {
     private UUID id;
     private String sellerId;
     private String sellerName;
+    private String locationId;
+    private String locationName;
     private String tableId;
     private SaleStatus status;
     private BigDecimal totalAmount;
@@ -39,6 +41,22 @@ public class SaleResponseDTO {
 
     public void setSellerName(String sellerName) {
         this.sellerName = sellerName;
+    }
+
+    public String getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 
     public String getTableId() {

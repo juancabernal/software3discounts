@@ -6,6 +6,7 @@ import java.util.List;
 public record SalePatchDTO(
         SaleStatus status,
         String sellerId,
+        String locationId,
         String tableId,
         List<SaleDetailDTO> details
 ) {}

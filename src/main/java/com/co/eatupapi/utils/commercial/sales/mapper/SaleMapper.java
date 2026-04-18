@@ -17,6 +17,8 @@ public class SaleMapper {
         dto.setId(domain.getId());
         dto.setSellerId(domain.getSeller().getId().toString());
         dto.setSellerName(domain.getSeller().getFirstName() + " " + domain.getSeller().getLastName());
+        dto.setLocationId(domain.getLocation().getId());
+        dto.setLocationName(domain.getLocation().getName());
         dto.setTableId(domain.getTableId());
         dto.setStatus(domain.getStatus());
         dto.setTotalAmount(domain.getTotalAmount());
@@ -35,8 +37,8 @@ public class SaleMapper {
         if (detail == null) return null;
 
         SaleDetailDTO dto = new SaleDetailDTO();
-        dto.setProductId(detail.getProduct().getId());
-        dto.setProductName(detail.getProduct().getName());
+        dto.setRecipeId(detail.getRecipe().getId());
+        dto.setRecipeName(detail.getRecipe().getName());
         dto.setQuantity(detail.getQuantity());
         dto.setUnitPrice(detail.getUnitPrice());
         dto.setSubtotal(detail.getSubtotal());

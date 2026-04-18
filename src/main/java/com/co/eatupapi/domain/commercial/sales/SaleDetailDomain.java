@@ -1,6 +1,6 @@
 package com.co.eatupapi.domain.commercial.sales;
 
-import com.co.eatupapi.domain.inventory.product.Product;
+import com.co.eatupapi.domain.inventory.recipe.RecipeDomain;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,8 +19,8 @@ public class SaleDetailDomain {
     private SaleDomain sale;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private RecipeDomain recipe;
 
     @Column(nullable = false)
     private BigDecimal quantity;
@@ -51,12 +51,12 @@ public class SaleDetailDomain {
         this.sale = sale;
     }
 
-    public Product getProduct() {
-        return product;
+    public RecipeDomain getRecipe() {
+        return recipe;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setRecipe(RecipeDomain recipe) {
+        this.recipe = recipe;
     }
 
     public BigDecimal getQuantity() {
