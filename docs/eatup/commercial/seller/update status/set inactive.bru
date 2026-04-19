@@ -11,7 +11,7 @@ patch {
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE3NzU4ODg5ODQsImV4cCI6MTc3NTkxNzc4NH0.YPepon18Hi1aK5CsUqXkSXTOFKZJfwGXSpROiMkgfCT8ONgC84ewwQrgMOL3yukj
+  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE3NzY1MjM5NTgsImV4cCI6MTc3NjU1Mjc1OH0.QRx_DN52wcHtQOmK7W1Bi2wotzpFrWh4WufWQjuAxV1f9OUz-N8Al45kQbXieZXC
 }
 
 body:json {
@@ -20,9 +20,13 @@ body:json {
   }
 }
 
-script:post-response {
+tests {
   test("Status code is 200", function() {
     expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Status is INACTIVE", function() {
+    expect(res.getBody().status).to.equal("INACTIVE");
   });
 }
 

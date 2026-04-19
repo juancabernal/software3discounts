@@ -11,12 +11,26 @@ get {
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE3NzU4ODMxNTQsImV4cCI6MTc3NTkxMTk1NH0.MesOKqvJxfGY_aeg9mBoJjNdbLYSI1egosnhgq55jXSgTcefJIQwVvnw3cuZWCQr
+  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE3NzY1MTgyMTAsImV4cCI6MTc3NjU0NzAxMH0.K4KYIggyT_CGrNsJV0mw8DaxVLmMeo7kGDepjBXMesVxh6m2SnzJWm9t61F8SeHu
 }
 
 script:post-response {
   test("Status code is 200", function() {
     expect(res.getStatus()).to.equal(200);
+  });
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response is an array", function() {
+    expect(res.getBody()).to.be.an("array");
+  });
+  
+  test("Array is not empty", function() {
+    expect(res.getBody().length).to.be.greaterThan(0);
   });
 }
 
