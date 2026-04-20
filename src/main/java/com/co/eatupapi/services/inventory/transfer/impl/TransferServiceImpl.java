@@ -1,4 +1,4 @@
-package com.co.eatupapi.services.inventory.transfer;
+package com.co.eatupapi.services.inventory.transfer.impl;
 
 import com.co.eatupapi.domain.inventory.product.Product;
 import com.co.eatupapi.domain.inventory.transfer.Transfer;
@@ -9,6 +9,7 @@ import com.co.eatupapi.dto.inventory.transfer.TransferStatusUpdateDTO;
 import com.co.eatupapi.repositories.inventory.location.LocationRepository;
 import com.co.eatupapi.repositories.inventory.product.ProductRepository;
 import com.co.eatupapi.repositories.inventory.transfer.TransferRepository;
+import com.co.eatupapi.services.inventory.transfer.TransferService;
 import com.co.eatupapi.utils.inventory.transfer.exceptions.TransferBusinessException;
 import com.co.eatupapi.utils.inventory.transfer.exceptions.TransferNotFoundException;
 import com.co.eatupapi.utils.inventory.transfer.exceptions.TransferValidationException;
