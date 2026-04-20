@@ -1,13 +1,21 @@
 package com.co.eatupapi.dto.commercial.sales;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Cuerpo de venta: vendedor, sede y mesa son opcionales (venta genérica sin enlazar).
+ * Si se envían identificadores, deben existir en sus respectivos módulos.
+ */
 public class SaleRequestDTO {
 
     private String sellerId;
     private UUID locationId;
     private String tableId;
+
+    @Valid
     private List<SaleDetailDTO> details;
 
     public String getSellerId() {
