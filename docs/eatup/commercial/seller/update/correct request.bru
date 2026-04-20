@@ -5,13 +5,9 @@ meta {
 }
 
 put {
-  url: http://localhost:8080/comercialapi/v1/sellers/132fc041-1759-4b9d-968f-5fea122a1744
+  url: http://localhost:8080/comercialapi/v1/sellers/{{sellerId}}
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE3NzY1MjM5NTgsImV4cCI6MTc3NjU1Mjc1OH0.QRx_DN52wcHtQOmK7W1Bi2wotzpFrWh4WufWQjuAxV1f9OUz-N8Al45kQbXieZXC
+  auth: inherit
 }
 
 body:json {
@@ -22,30 +18,23 @@ body:json {
     "firstName": "Juan",
     "lastName": "Gomez",
     "phone": "3009878593",
-    "email": "caryulo1s6@gmail.com",
+    "email": "{{sellerEmail}}",
     "commissionPercentage": 15.0
   }
-}
-
-script:post-response {
-  test("Status code is 200", function() {
-    expect(res.getStatus()).to.equal(200);
-  });
 }
 
 tests {
   test("Status code is 200", function() {
     expect(res.getStatus()).to.equal(200);
   });
-  
+  test("Last name was updated", function() {
+    expect(res.getBody().lastName).to.equal("Gomez");
+  });
+  test("Commission was updated", function() {
+    expect(res.getBody().commissionPercentage).to.equal(15.0);
+  });
   test("Response has id", function() {
     expect(res.getBody()).to.have.property("id");
-  });
-  
-  test("Data was updated", function() {
-    const body = res.getBody();
-    expect(body.firstName).to.equal("Juan");
-    expect(body.lastName).to.equal("Gomez");
   });
 }
 

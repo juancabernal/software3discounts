@@ -7,23 +7,28 @@ meta {
 post {
   url: http://localhost:8080/comercialapi/v1/sellers
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE3NzY1MTgyMTAsImV4cCI6MTc3NjU0NzAxMH0.K4KYIggyT_CGrNsJV0mw8DaxVLmMeo7kGDepjBXMesVxh6m2SnzJWm9t61F8SeHu
+  auth: inherit
 }
 
 body:json {
   {
     "documentTypeId": "b9734b27-272a-418a-aba9-3ceb4864e39b",
     "locationId": "550e8400-e29b-41d4-a716-446655440000",
-    "identificationNumber": "1112223334",
+    "identificationNumber": "11221691434",
     "firstName": "Juan",
     "lastName": "Perez",
-    "phone": "3002222222",
-    "email": "juan.nuevo@email.com",
+    "phone": "3002226322",
+    "email": "juan@gmail.com",
     "commissionPercentage": 10.5
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  if (data && data.id) {
+    bru.setVar("sellerId", data.id);
+    bru.setVar("sellerPhone", data.phone);
+    bru.setVar("sellerEmail", data.email);
   }
 }
 
@@ -39,8 +44,8 @@ tests {
   
   test("Email is saved in lowercase", function() {
     const body = res.getBody();
-    expect(body.email).to.equal("juan.nuevo@email.com"); // ← actualizar
-  });
+    expect(body.email).to.equal(body.email.toLowerCase());
+  })
   
   test("Status is ACTIVE", function() {
     const body = res.getBody();
