@@ -10,12 +10,6 @@ get {
   auth: inherit
 }
 
-script:post-response {
-  test("Status code is 404", function() {
-    expect(res.getStatus()).to.equal(404);
-  });
-}
-
 tests {
   test("Status code is 404", function() {
     expect(res.getStatus()).to.equal(404);
