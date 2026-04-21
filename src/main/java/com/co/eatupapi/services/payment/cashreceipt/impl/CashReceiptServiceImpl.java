@@ -1,10 +1,11 @@
-package com.co.eatupapi.services.payment.cashreceipt;
+package com.co.eatupapi.services.payment.cashreceipt.impl;
 
 import com.co.eatupapi.domain.payment.cashreceipt.CashReceipt;
 import com.co.eatupapi.domain.payment.cashreceipt.CashReceiptStatus;
 import com.co.eatupapi.dto.payment.cashreceipt.CashReceiptResponse;
 import com.co.eatupapi.dto.payment.cashreceipt.CreateCashReceiptRequest;
 import com.co.eatupapi.repositories.payment.cashreceipt.CashReceiptRepository;
+import com.co.eatupapi.services.payment.cashreceipt.CashReceiptService;
 import com.co.eatupapi.utils.payment.cashreceipt.exceptions.CashReceiptBusinessException;
 import com.co.eatupapi.utils.payment.cashreceipt.exceptions.CashReceiptNotFoundException;
 import com.co.eatupapi.utils.payment.cashreceipt.exceptions.ErrorCode;
