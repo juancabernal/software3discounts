@@ -1,5 +1,6 @@
 package com.co.eatupapi.utils.inventory.transfer.exceptions;
 
+import com.co.eatupapi.controllers.inventory.transfer.TransferController;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice(assignableTypes = TransferController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TransferExceptionHandler {
 

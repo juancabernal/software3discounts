@@ -1,8 +1,7 @@
 package com.co.eatupapi.domain.inventory.transfer;
 
 public enum TransferStatus {
-    PENDIENTE,
-    EN_PROCESO,
+    EN_TRANSITO,
     COMPLETADO,
     CANCELADO
 }
