@@ -72,7 +72,7 @@ public class TransferController {
     }
 
     @Operation(summary = "Obtener traslados en transito",
-               description = "Permite obtener una lista de los traslados que actualmente estan en estado EN_TRANSITO.")
+               description = "Permite obtener una lista de los traslados que actualmente estan en estado EN_PROCESO.")
     @ApiResponse(responseCode = "200", description = "Lista de traslados en transito devuelta exitosamente")
     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/in-transit")

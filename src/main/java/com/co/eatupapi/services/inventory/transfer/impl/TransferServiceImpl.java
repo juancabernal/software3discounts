@@ -24,6 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TransferServiceImpl implements TransferService {
 
+    private static final String ORIGIN_ROLE = "origen";
+    private static final String DESTINATION_ROLE = "destino";
+
+    private record TransferProducts(Product originProduct, Product destinationProduct) {
+    }
+
     private final TransferRepository transferRepository;
     private final TransferMapper transferMapper;
     private final ProductRepository productRepository;
@@ -42,10 +48,10 @@ public class TransferServiceImpl implements TransferService {
     @Override
     @Transactional
     public TransferResponseDTO create(TransferRequestDTO request) {
-        Product product = validateAndLoadRequest(request);
+        TransferProducts products = validateAndLoadRequest(request);
         Transfer transfer = transferMapper.toDomain(request);
-        transfer.setEstado(TransferStatus.EN_TRANSITO);
-        transfer.setStock(product.getStock());
+        transfer.setEstado(TransferStatus.EN_PROCESO);
+        transfer.setStock(products.originProduct().getStock());
         return transferMapper.toResponse(transferRepository.save(transfer));
     }
 
@@ -61,6 +67,9 @@ public class TransferServiceImpl implements TransferService {
                 .orElseThrow(() -> new TransferNotFoundException("Transferencia no encontrada con id: " + id));
 
         validateStatusTransition(transfer.getEstado(), statusUpdate.estado());
+        if (statusUpdate.estado() == TransferStatus.COMPLETADO) {
+            applyInventoryMovement(transfer);
+        }
         transfer.setEstado(statusUpdate.estado());
         return transferMapper.toResponse(transferRepository.save(transfer));
     }
@@ -83,7 +92,7 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public List<TransferResponseDTO> findAllInTransit() {
-        return transferRepository.findByEstado(TransferStatus.EN_TRANSITO)
+        return transferRepository.findByEstado(TransferStatus.EN_PROCESO)
                 .stream()
                 .map(transferMapper::toResponse)
                 .toList();
@@ -117,23 +126,19 @@ public class TransferServiceImpl implements TransferService {
         }
         validateLocations(request);
         validateCoreFields(request);
+        validateDates(request);
         validateQuantity(request);
     }
 
-    private Product validateAndLoadRequest(TransferRequestDTO request) {
+    private TransferProducts validateAndLoadRequest(TransferRequestDTO request) {
         validateRequest(request);
-        validateLocationExistsAndActive(request.sedeOrigen(), "origen");
-        validateLocationExistsAndActive(request.sedeDestino(), "destino");
+        validateLocationExistsAndActive(request.sedeOrigen(), ORIGIN_ROLE);
+        validateLocationExistsAndActive(request.sedeDestino(), DESTINATION_ROLE);
 
-        Product product = productRepository.findById(request.producto())
-                .orElseThrow(() -> new TransferNotFoundException("Producto no encontrado con id: " + request.producto()));
-
-        if (!request.sedeOrigen().equals(product.getLocationId().toString())) {
-            throw new TransferBusinessException("El producto no pertenece a la sede de origen indicada");
-        }
-
-        validateStockAndQuantity(product.getStock(), request.cantidad());
-        return product;
+        Product originProduct = findProductByNameAndLocation(request.producto(), request.sedeOrigen(), ORIGIN_ROLE);
+        Product destinationProduct = findProductByNameAndLocation(request.producto(), request.sedeDestino(), DESTINATION_ROLE);
+        validateStockAndQuantity(originProduct.getStock(), request.cantidad());
+        return new TransferProducts(originProduct, destinationProduct);
     }
 
     private void validateLocations(TransferRequestDTO request) {
@@ -152,11 +157,26 @@ public class TransferServiceImpl implements TransferService {
         if (request.fechaEnvio() == null) {
             throw new TransferValidationException("La fecha de transferencia es obligatoria");
         }
+        if (request.fechaLlegada() == null) {
+            throw new TransferValidationException("La fecha de llegada es obligatoria");
+        }
         if (request.responsable() == null || request.responsable().isBlank()) {
             throw new TransferValidationException("El responsable es obligatorio");
         }
-        if (request.producto() == null) {
+        if (request.producto() == null || request.producto().isBlank()) {
             throw new TransferValidationException("El producto es obligatorio y debe ser válido");
+        }
+    }
+
+    private void validateDates(TransferRequestDTO request) {
+        if (request.fechaEnvio().toLocalDate().isBefore(java.time.LocalDate.now())) {
+            throw new TransferValidationException("La fecha de envío no puede ser anterior a la fecha actual");
+        }
+        if (request.fechaLlegada().toLocalDate().isBefore(java.time.LocalDate.now())) {
+            throw new TransferValidationException("La fecha de llegada no puede ser anterior a la fecha actual");
+        }
+        if (request.fechaLlegada().isBefore(request.fechaEnvio())) {
+            throw new TransferValidationException("La fecha de llegada no puede ser anterior a la fecha de envío");
         }
     }
 
@@ -175,8 +195,53 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
+    private void applyInventoryMovement(Transfer transfer) {
+        TransferProducts products = loadProductsFromTransfer(transfer);
+        BigDecimal quantity = BigDecimal.valueOf(transfer.getCantidad().longValue());
+
+        validateStockAndQuantity(products.originProduct().getStock(), transfer.getCantidad());
+
+        products.originProduct().setStock(products.originProduct().getStock().subtract(quantity));
+        products.destinationProduct().setStock(products.destinationProduct().getStock().add(quantity));
+
+        productRepository.save(products.originProduct());
+        productRepository.save(products.destinationProduct());
+        transfer.setStock(products.originProduct().getStock());
+    }
+
+    private TransferProducts loadProductsFromTransfer(Transfer transfer) {
+        Product originProduct = findProductByNameAndLocation(transfer.getProducto(), transfer.getSedeOrigen(), ORIGIN_ROLE);
+        Product destinationProduct = findProductByNameAndLocation(transfer.getProducto(), transfer.getSedeDestino(), DESTINATION_ROLE);
+        return new TransferProducts(originProduct, destinationProduct);
+    }
+
+    private Product findProductByNameAndLocation(String productName, String locationId, String role) {
+        UUID locationUuid;
+        try {
+            locationUuid = UUID.fromString(locationId);
+        } catch (IllegalArgumentException ex) {
+            throw new TransferValidationException("La sede de " + role + " debe ser un UUID válido");
+        }
+
+        return productRepository.findAll().stream()
+                .filter(product -> locationUuid.equals(product.getLocationId()))
+                .filter(product -> product.getName() != null)
+                .filter(product -> product.getName().trim().equalsIgnoreCase(productName.trim()))
+                .findFirst()
+                .orElseThrow(() -> new TransferNotFoundException(
+                        "No existe el producto '" + productName + "' en la sede de " + role
+                ));
+    }
+
     private void validateLocationExistsAndActive(String locationId, String role) {
-        locationRepository.findById(UUID.fromString(locationId))
+        UUID parsedLocationId;
+        try {
+            parsedLocationId = UUID.fromString(locationId);
+        } catch (IllegalArgumentException ex) {
+            throw new TransferValidationException("La sede de " + role + " debe ser un UUID válido");
+        }
+
+        locationRepository.findById(parsedLocationId)
                 .filter(com.co.eatupapi.repositories.inventory.location.LocationEntity::isActive)
                 .orElseThrow(() -> new TransferNotFoundException("La sede de " + role + " no existe o está inactiva"));
     }
@@ -187,7 +252,7 @@ public class TransferServiceImpl implements TransferService {
         }
 
         boolean validTransition = switch (currentStatus) {
-            case EN_TRANSITO -> nextStatus == TransferStatus.COMPLETADO || nextStatus == TransferStatus.CANCELADO;
+            case EN_PROCESO -> nextStatus == TransferStatus.COMPLETADO || nextStatus == TransferStatus.CANCELADO;
             case COMPLETADO, CANCELADO -> false;
         };
 

@@ -4,7 +4,6 @@ import com.co.eatupapi.domain.inventory.transfer.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public record TransferResponseDTO(
         Long idTraslado,
@@ -13,7 +12,7 @@ public record TransferResponseDTO(
         LocalDateTime fechaEnvio,
         LocalDateTime fechaLlegada,
         String responsable,
-        UUID producto,
+        String producto,
         BigDecimal stock,
         Integer cantidad,
         String observaciones,

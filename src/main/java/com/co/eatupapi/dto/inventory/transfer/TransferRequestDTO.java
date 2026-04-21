@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public record TransferRequestDTO(
         @NotBlank(message = "La sede de origen es obligatoria")
@@ -22,8 +21,8 @@ public record TransferRequestDTO(
         @NotBlank(message = "El responsable es obligatorio")
         String responsable,
 
-        @NotNull(message = "El producto es obligatorio")
-        UUID producto,
+        @NotBlank(message = "El producto es obligatorio")
+        String producto,
 
         @NotNull(message = "La cantidad es obligatoria")
         @Positive(message = "La cantidad debe ser mayor a cero")

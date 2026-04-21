@@ -3,7 +3,6 @@ package com.co.eatupapi.domain.inventory.transfer;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "transfers")
@@ -30,7 +29,7 @@ public class Transfer {
     private String responsable;
 
     @Column(name = "producto", nullable = false)
-    private UUID producto;
+    private String producto;
 
     @Column(name = "stock", nullable = false, precision = 15, scale = 3)
     private BigDecimal stock;
@@ -60,7 +59,7 @@ public class Transfer {
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
         if (this.estado == null) {
-            this.estado = TransferStatus.EN_TRANSITO;
+            this.estado = TransferStatus.EN_PROCESO;
         }
         if (this.createdAt == null) {
             this.createdAt = now;
@@ -121,11 +120,11 @@ public class Transfer {
         this.responsable = responsable;
     }
 
-    public UUID getProducto() {
+    public String getProducto() {
         return producto;
     }
 
-    public void setProducto(UUID producto) {
+    public void setProducto(String producto) {
         this.producto = producto;
     }
 
